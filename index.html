@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/pin-map.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phoodie</title>
+    <title>Find Food | Good meals around you</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -19,6 +19,7 @@
     <style>
       body {
         font-family: Arial, Helvetica, sans-serif;
+        background: rgb(222, 223, 220);
       }
       .appName {
         position: absolute;
@@ -26,7 +27,8 @@
         left: 10%;
         font-family: cursive, Arial, Helvetica, sans-serif;
 
-        text-shadow: 2px 2px 5px red;
+        /* text-shadow: 2px 2px 5px red; */
+        text-shadow: 2px 2px 5px magenta;
         z-index: 1000;
       }
       #map {
@@ -100,22 +102,33 @@
       textarea {
         padding: 6px;
       }
+      #savingEntry {
+        display: none;
+        color: teal;
+      }
+      #saveComment {
+        display: none;
+        color: rgb(206, 10, 163);
+      }
 
       @media (max-width: 600px) {
         .appName {
           left: 25%;
         }
         h3 {
-          margin-left: 15%;
+          margin-left: 13%;
         }
         .close-btn {
-          margin-right: 38px;
+          margin-right: 32px;
         }
         .modal-content {
           display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
+          width: 100%;
+          padding: 4px;
+          background-color: rgb(253, 249, 234);
           overflow: auto;
         }
       }
@@ -125,7 +138,7 @@
     <!-- <div id="app"></div> -->
     <!-- <script type="module" src="/src/main.js"></script> -->
     <!-- <script type="module" src="/src/mapper.js"></script> -->
-    <h1 class="appName">Phoodie</h1>
+    <h1 class="appName">FindFood</h1>
     <div id="map"></div>
     <div id="modal" class="modal"></div>
 
@@ -247,6 +260,7 @@
         <textarea rows="5" cols="26" name="review" placeholder="Review" required></textarea><br>
 
         <button type="submit">Save</button>
+        <p id="savingEntry">Saving..</p>
       </form>
       </div>
     `;
@@ -256,18 +270,26 @@
             .addEventListener("click", closeModal);
 
           document.getElementById("newForm").onsubmit = async (e) => {
-            e.preventDefault();
-            const form = e.target;
+            try {
+              e.preventDefault();
+              document.getElementById("savingEntry").style.display = "block";
+              const form = e.target;
 
-            await supabase.from("restaurants").insert({
-              name: form.name.value,
-              review: form.review.value,
-              image_url: form.image_url.value,
-              lat,
-              lng,
-            });
-            closeModal();
-            alert("Restaurant added!");
+              await supabase.from("restaurants").insert({
+                name: form.name.value,
+                review: form.review.value,
+                address: form.address.value,
+                lat,
+                lng,
+              });
+
+              closeModal();
+              alert("Restaurant added!");
+            } catch (error) {
+              alert("Oops! Couldn't save your entry. Try again?");
+            } finally {
+              document.getElementById("savingEntry").style.display = "none";
+            }
           };
         } else {
           const { data: comments } = await supabase
@@ -283,22 +305,24 @@
                   .join("")
               : "<p>No comments yet.</p>";
 
-          const imgSrc = restaurant.image_url
-            ? restaurant.image_url
-            : PLACEHOLDER_IMG;
+          // const imgSrc = restaurant.image_url
+          //   ? restaurant.image_url
+          //   : PLACEHOLDER_IMG;
+          //<img src="${imgSrc}" alt="Restaurant Image" class="restaurant-img">
 
           modal.innerHTML = `
       <span class="close-btn" id="closeBtn2">✖</span>
       <div class="modal-content">
       <h3>${restaurant.name}</h3>
-      <img src="${imgSrc}" alt="Restaurant Image" class="restaurant-img">
-      <p style="border:1px solid gray">${restaurant.review}</p>
+      <p>${restaurant.address}</p>
+      <p style="border:1px solid wheat;padding:6px;">${restaurant.review}</p>
       
       <div class="comments">${commentsHTML}</div>
       <h4>Add Comment</h4>
       <form id="commentForm">
         <textarea rows="3" name="comment" required></textarea><br>
         <button type="submit">Save Comment</button>
+        <p id="saveComment">Saving..</p>
       </form>
       </div>
     `;
@@ -308,14 +332,21 @@
             .addEventListener("click", closeModal);
 
           document.getElementById("commentForm").onsubmit = async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            await supabase.from("comments").insert({
-              restaurant_id: restaurant.id,
-              comment: form.comment.value,
-            });
-            closeModal();
-            alert("Comment added!");
+            try {
+              e.preventDefault();
+              document.getElementById("saveComment").style.display = "block";
+              const form = e.target;
+              await supabase.from("comments").insert({
+                restaurant_id: restaurant.id,
+                comment: form.comment.value,
+              });
+              closeModal();
+              alert("Comment added!");
+            } catch (error) {
+              alert("Couldn't add your comment. Try again?");
+            } finally {
+              document.getElementById("saveComment").style.display = "none";
+            }
           };
         }
       }
