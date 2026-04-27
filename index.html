@@ -354,10 +354,13 @@
         );
         const map = initMap(); // fallback to Lagos center
       } else {
+        /**
         navigator.geolocation.getCurrentPosition(
           successCallback,
           errorCallback,
         );
+        */
+        navigator.geolocation.watchPosition(successCallback, errorCallback);
       }
 
       async function successCallback(pos) {
