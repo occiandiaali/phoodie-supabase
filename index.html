@@ -160,16 +160,16 @@
         color: rgb(206, 10, 163);
       }
       .discover-icon {
-        width: 28px;
-        height: 28px;
+        width: 48px;
+        height: 48px;
 
         cursor: pointer;
       }
       .discover-pulse {
         position: absolute;
         top: 3%;
-        right: 3%;
-        margin: 8px;
+        right: 2%;
+        margin: 6px;
         z-index: 1000;
         display: inline-block; /* Ensures the container fits the icon */
         animation: pulse-animation 2s infinite; /* Animation properties */
@@ -292,11 +292,11 @@
     <!-- <div id="app"></div> -->
     <!-- <script type="module" src="/src/main.js"></script> -->
     <!-- <script type="module" src="/src/mapper.js"></script> -->
-    <h1 class="appName">Food in this area</h1>
+    <h1 class="appName">Nearby Foodiscovery</h1>
     <input placeholder="Search by keyword.." id="searchfld" />
     <div class="discover-pulse">
       <img
-        src="/src/assets/discover.svg"
+        src="/src/assets/browse.png"
         alt="discover icon"
         class="discover-icon"
         id="discover-icon"
@@ -551,6 +551,7 @@
               </div>
             </div>
           </div><!--content end-->
+            
         </div>
         `;
         document
